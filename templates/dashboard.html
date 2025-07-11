@@ -1,0 +1,9 @@
+<h1>Dashboard</h1>
+<ul>
+  {% for user in users %}
+    <li>{{ user.name }} - €{{ "%.2f"|format(user.total_donated) }}</li>
+  {% endfor %}
+</ul>
+<form action="/logout" method="get">
+  <button>Logout</button>
+</form>
