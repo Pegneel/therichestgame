@@ -1,11 +1,11 @@
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
 from flask import Flask, render_template, redirect, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
+import os
 import stripe
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
@@ -143,6 +143,18 @@ def fake_donation():
         db.session.commit()
     return redirect('/dashboard')
 
+@app.route('/disclaimer')
+def disclaimer():
+    return render_template('legal/disclaimer.html')
+
+@app.route('/terms')
+def terms():
+    return render_template('legal/terms.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('legal/privacy.html')
+
 @app.route('/success')
 def success():
     session_id = request.args.get('session_id')
@@ -160,7 +172,7 @@ def success():
         session['user'] = {'email': user.email, 'name': user.name}
     return redirect('/dashboard')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
