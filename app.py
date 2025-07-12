@@ -3,12 +3,15 @@ from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
 import os
 import stripe
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 from dotenv import load_dotenv
+load_dotenv()
+
 
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY")
+app.secret_key = os.environ.get("SECRET_KEY") or "this_should_be_changed"
 
 # Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
@@ -21,11 +24,10 @@ google = oauth.register(
     name='google',
     client_id=os.getenv("GOOGLE_CLIENT_ID"),
     client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-    api_base_url='https://www.googleapis.com/oauth2/v1/',
-    userinfo_endpoint='https://openidconnect.googleapis.com/v1/userinfo',
-    client_kwargs={'scope': 'openid email profile'}
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={
+        'scope': 'openid email profile'
+    }
 )
 
 # Stripe
@@ -49,7 +51,7 @@ def index():
 
 @app.route('/login')
 def login():
-    redirect_uri = url_for('authorized', _external=True)
+    redirect_uri = url_for('auth', _external=True)  # usa 'auth' qui
     return google.authorize_redirect(redirect_uri)
 
 @app.route('/logout')
@@ -57,18 +59,21 @@ def logout():
     session.clear()
     return redirect('/')
 
-@app.route('/login/authorized')
-def authorized():
+@app.route('/login/auth')
+def auth():
     token = google.authorize_access_token()
-    resp = google.get('userinfo')
+    resp = google.get('https://openidconnect.googleapis.com/v1/userinfo')
     user_info = resp.json()
     session['user'] = user_info
+
     user = User.query.filter_by(email=user_info['email']).first()
     if not user:
         user = User(email=user_info['email'], name=user_info['name'])
         db.session.add(user)
         db.session.commit()
+
     return redirect('/dashboard')
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -113,12 +118,35 @@ def create_checkout_session():
 def donate():
     if 'user' not in session:
         return redirect('/')
+
     amount = float(request.form.get('amount', 0))
-    user = User.query.filter_by(email=session['user']['email']).first()
-    if user:
-        user.total_donated += float(amount)
-        db.session.commit()
-    return redirect('/dashboard')
+    if amount <= 0:
+        return redirect('/dashboard')
+
+    # Crea sessione Stripe
+    session_stripe = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency': 'eur',
+                'product_data': {
+                    'name': 'Giocata su The Richest',
+                },
+                'unit_amount': int(amount * 100),  # converti euro in centesimi
+            },
+            'quantity': 1,
+        }],
+        mode='payment',
+        success_url=url_for('success', _external=True),
+        cancel_url=url_for('dashboard', _external=True),
+        metadata={
+            'email': session['user']['email'],
+            'amount': amount
+        }
+    )
+
+    return redirect(session_stripe.url, code=303)
+
 
 @app.route('/reset', methods=['POST'])
 def reset():
@@ -157,20 +185,18 @@ def privacy():
 
 @app.route('/success')
 def success():
-    session_id = request.args.get('session_id')
-    if not session_id:
-        return redirect('/login')
-    stripe_session = stripe.checkout.Session.retrieve(session_id)
-    user_email = stripe_session.metadata.get('user_email')
-    amount = stripe_session.amount_total / 100.0
-    user = User.query.filter_by(email=user_email).first()
+    if 'user' not in session or 'donation_amount' not in session:
+        return redirect('/')
+
+    amount = session.pop('donation_amount')  # rimuove e restituisce l'importo
+    user = User.query.filter_by(email=session['user']['email']).first()
+
     if user:
-        if session.get('last_processed') != session_id:
-            user.total_donated += float(amount)
-            db.session.commit()
-            session['last_processed'] = session_id
-        session['user'] = {'email': user.email, 'name': user.name}
+        user.total_donated += float(amount)
+        db.session.commit()
+
     return redirect('/dashboard')
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
