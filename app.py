@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
+from flask import jsonify
 import os
 import stripe
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
@@ -182,6 +183,12 @@ def terms():
 @app.route('/privacy')
 def privacy():
     return render_template('legal/privacy.html')
+
+@app.route('/api/leaderboard')
+def api_leaderboard():
+    users = User.query.order_by(User.total_donated.desc()).limit(50).all()
+    data = [{'name': u.name, 'amount': u.total_donated} for u in users]
+    return jsonify(data)
 
 @app.route('/success')
 def success():

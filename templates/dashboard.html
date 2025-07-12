@@ -39,24 +39,42 @@
                 <th>Name</th>
                 <th>Total Donated (€)</th>
             </tr>
-            {% for user in users %}
-            <tr class="{% if loop.index == 1 %}gold-row{% elif loop.index == 2 %}silver-row{% elif loop.index == 3 %}bronze-row{% endif %}">
-                <td class="rank-cell">
-                    {% if loop.index == 1 %}
-                        <span class="medal gold">🥇</span>
-                    {% elif loop.index == 2 %}
-                        <span class="medal silver">🥈</span>
-                    {% elif loop.index == 3 %}
-                        <span class="medal bronze">🥉</span>
-                    {% else %}
-                        <span class="rank-number">{{ loop.index }}</span>
-                    {% endif %}
-                </td>
-                <td>{{ user.name }}</td>
-                <td>{{ '%.2f' % user.total_donated }}</td>
-            </tr>
-            {% endfor %}
+            <tbody id="leaderboard">
+                <!-- Classifica aggiornata in JS -->
+            </tbody>
         </table>
     </div>
+
+    <script>
+    async function refreshLeaderboard() {
+        const response = await fetch('/api/leaderboard');
+        const data = await response.json();
+        const tbody = document.getElementById('leaderboard');
+        tbody.innerHTML = '';
+
+        data.forEach((user, index) => {
+            const row = document.createElement('tr');
+
+            let rankClass = '';
+            let medal = '';
+            if (index === 0) { rankClass = 'gold-row'; medal = '🥇'; }
+            else if (index === 1) { rankClass = 'silver-row'; medal = '🥈'; }
+            else if (index === 2) { rankClass = 'bronze-row'; medal = '🥉'; }
+
+            row.className = rankClass;
+
+            row.innerHTML = `
+                <td class="rank-cell">${medal || '<span class="rank-number">' + (index + 1) + '</span>'}</td>
+                <td>${user.name}</td>
+                <td>€${parseFloat(user.amount).toFixed(2)}</td>
+            `;
+
+            tbody.appendChild(row);
+        });
+    }
+
+    refreshLeaderboard();
+    setInterval(refreshLeaderboard, 5000);
+    </script>
 </body>
 </html>
