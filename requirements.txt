@@ -1,6 +1,6 @@
 Flask
-Flask_SQLAlchemy
-Authlib
 stripe
 python-dotenv
 gunicorn
+authlib
+Flask-SQLAlchemy
