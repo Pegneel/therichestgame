@@ -159,18 +159,26 @@ def reset():
 
 @app.route('/fake_donation', methods=['POST'])
 def fake_donation():
-    if 'user' in session and session['user']['email'] == 'andrewpegoraro94@gmail.com':
-        name = request.form.get('name')
-        amount = float(request.form.get('amount'))
-        user = FakeUser.query.filter_by(name=name).first()
-        if not user:
-            user = FakeUser(name=name, total_donated=0.0)
-            db.session.add(user)
-        if user.total_donated is None:
-            user.total_donated = 0.0
-        user.total_donated += amount
-        db.session.commit()
+    if 'user' not in session or session['user']['email'] != 'andrewpegoraro94@gmail.com':
+        return redirect('/')
+
+    name = request.form.get('name')
+    amount = float(request.form.get('amount'))
+
+    if not name or amount <= 0:
+        return "Invalid data", 400
+
+    # Cerca un utente esistente con quel nome
+    user = User.query.filter_by(name=name).first()
+    if not user:
+        fake_email = f"{name.replace(' ', '').lower()}@fake.com"
+        user = User(name=name, email=fake_email, total_donated=0.0)
+        db.session.add(user)
+
+    user.total_donated += amount
+    db.session.commit()
     return redirect('/dashboard')
+
 
 @app.route('/disclaimer')
 def disclaimer():
@@ -192,15 +200,30 @@ def api_leaderboard():
 
 @app.route('/success')
 def success():
-    if 'user' not in session or 'donation_amount' not in session:
-        return redirect('/')
+    session_id = request.args.get('session_id')
+    print("✅ Success route reached, session_id:", session_id)
 
-    amount = session.pop('donation_amount')  # rimuove e restituisce l'importo
-    user = User.query.filter_by(email=session['user']['email']).first()
+    if not session_id:
+        return "Missing session ID", 400
 
-    if user:
-        user.total_donated += float(amount)
-        db.session.commit()
+    try:
+        session_data = stripe.checkout.Session.retrieve(session_id)
+        customer_email = session_data['customer_email']
+        amount_total = session_data['amount_total'] / 100  # da centesimi a euro
+
+        print(f"✅ Payment by {customer_email}: €{amount_total}")
+
+        user = User.query.filter_by(email=customer_email).first()
+        if user:
+            user.total_donated += amount_total
+            db.session.commit()
+            print(f"✅ Updated {user.name}'s total to €{user.total_donated}")
+        else:
+            print("❌ User not found in database")
+
+    except Exception as e:
+        print("❌ Error in success route:", str(e))
+        return "Error processing payment", 500
 
     return redirect('/dashboard')
 
