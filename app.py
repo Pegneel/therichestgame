@@ -94,8 +94,11 @@ def create_checkout_session():
         return "Amount too low", 400
     amount_cents = int(amount * 100)
     session['donation_amount'] = amount
-    success_url = url_for('success', _external=True)
-    cancel_url = url_for('dashboard', _external=True)
+
+    # URL assoluti per l'ambiente di produzione
+    success_url = "https://therichestgame.com/success"
+    cancel_url = "https://therichestgame.com/dashboard"
+
     checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items=[{
@@ -114,6 +117,7 @@ def create_checkout_session():
         metadata={'user_email': session['user']['email']}
     )
     return redirect(checkout_session.url, code=303)
+
 
 @app.route('/donate', methods=['POST'])
 def donate():
