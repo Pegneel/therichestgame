@@ -37,9 +37,12 @@ stripe_pub_key = os.getenv("STRIPE_PUBLIC_KEY")
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True)
-    name = db.Column(db.String(120))
+    google_id = db.Column(db.String(100), unique=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(100), unique=True)
+    username = db.Column(db.String(100))
     total_donated = db.Column(db.Float, default=0.0)
+
 
 class FakeUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,12 +71,18 @@ def auth():
     session['user'] = user_info
 
     user = User.query.filter_by(email=user_info['email']).first()
+
     if not user:
         user = User(email=user_info['email'], name=user_info['name'])
         db.session.add(user)
         db.session.commit()
 
+    if not user.username:
+        return redirect('/set_username')
+
     return redirect('/dashboard')
+
+
 
 
 @app.route('/dashboard')
@@ -83,7 +92,34 @@ def dashboard():
     real_users = User.query.all()
     fake_users = FakeUser.query.all()
     users = sorted(real_users + fake_users, key=lambda u: u.total_donated, reverse=True)
-    return render_template('dashboard.html', users=users, current_user=session['user'])
+    logged_in_user = User.query.filter_by(email=session['user']['email']).first()
+    return render_template('dashboard.html', users=users, current_user=logged_in_user)
+
+
+@app.route('/set_username', methods=['GET', 'POST'])
+def set_username():
+    if 'user' not in session:
+        return redirect('/')
+
+    current_email = session['user']['email']
+    user = User.query.filter_by(email=current_email).first()
+
+    if request.method == 'POST':
+        new_username = request.form.get('username', '').strip()
+
+        # Controlli
+        if len(new_username) < 1 or len(new_username) > 20:
+            return render_template('choose_username.html', error="Username must be 1–20 characters.")
+
+        if User.query.filter(User.username == new_username, User.email != current_email).first():
+            return render_template('choose_username.html', error="Username already taken.")
+
+        user.username = new_username
+        db.session.commit()
+        return redirect('/dashboard')
+
+    return render_template('choose_username.html', error=None)
+
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
@@ -199,7 +235,7 @@ def privacy():
 @app.route('/api/leaderboard')
 def api_leaderboard():
     users = User.query.order_by(User.total_donated.desc()).limit(50).all()
-    data = [{'name': u.name, 'amount': u.total_donated} for u in users]
+    data = [{'name': u.username or u.name, 'amount': u.total_donated} for u in users]
     return jsonify(data)
 
 @app.route('/success')

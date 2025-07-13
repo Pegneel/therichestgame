@@ -31,8 +31,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>🏆 Leaderboard</h1>
+        <div style="text-align: center;">
+    <h1>🏆 Leaderboard</h1>
+</div>
         <p>Welcome, {{ current_user.name }} (<a href="/logout">Logout</a>)</p>
+        <p>Welcome, {{ current_user.username or current_user.name }} 
+(<a href="/set_username">Change Username</a> | <a href="/logout">Logout</a>)</p>
 
         <form action="/create-checkout-session" method="post" style="margin: 20px 0;">
             <input 

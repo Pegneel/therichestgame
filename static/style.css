@@ -1,52 +1,64 @@
-body {
-    background-color: #0d0d0d;
-    color: #f0f0f0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-align: center;
+/* --- STILE BASE --- */
+html, body {
+    height: 100%;
     margin: 0;
     padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0d0d0d;
+    color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    text-align: center;
 }
 
+/* --- CONTAINER --- */
 .container {
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 20px;
+    width: 100%;
+    max-width: 1000px;
+    padding: 30px 20px;
     background-color: #1a1a1a;
     border-radius: 12px;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+    box-sizing: border-box;
+    margin: 0 auto;
 }
 
+/* --- TIPOGRAFIA --- */
 h1 {
     color: gold;
     margin-bottom: 30px;
+    font-size: 32px;
 }
 
 a {
     color: gold;
     text-decoration: none;
 }
-
 a:hover {
     text-decoration: underline;
 }
 
+/* --- FORM --- */
 form {
     margin: 20px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
 }
 
 input[type="number"],
 input[type="text"] {
     padding: 10px;
     width: 200px;
-    max-width: 100%;
     border: 1px solid #444;
     border-radius: 6px;
     background-color: #222;
     color: #f0f0f0;
     font-size: 16px;
     transition: border 0.3s;
-    box-sizing: border-box;
-    margin: 5px 0;
 }
 
 input[type="number"]:focus,
@@ -55,7 +67,9 @@ input[type="text"]:focus {
     outline: none;
 }
 
-button {
+/* --- BUTTONS --- */
+button,
+.reset-btn {
     padding: 10px 20px;
     background-color: gold;
     color: black;
@@ -65,29 +79,35 @@ button {
     font-size: 16px;
     cursor: pointer;
     transition: background 0.3s;
-    margin-left: 10px;
 }
 
 button:hover {
     background-color: #ffd700;
 }
 
+.reset-btn {
+    background-color: #cc0000;
+    color: white;
+}
+.reset-btn:hover {
+    background-color: #ff0000;
+}
+
+/* --- TABELLA --- */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 30px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 30px;
-    overflow-x: auto;
-    display: block;
 }
 
 th, td {
     padding: 12px;
     border-bottom: 1px solid #333;
-    white-space: nowrap;
-}
-
-tr:nth-child(even) {
-    background-color: #2a2a2a;
+    text-align: center;
 }
 
 th {
@@ -95,38 +115,11 @@ th {
     color: gold;
 }
 
-.google-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 24px;
-    background-color: white;
-    color: #444;
-    font-weight: bold;
-    font-size: 16px;
-    border: none;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+tr:nth-child(even) {
+    background-color: #2a2a2a;
 }
 
-.google-btn:hover {
-    background-color: gold;
-    color: black;
-}
-
-.google-logo {
-    width: 20px;
-    height: 20px;
-}
-
-/* Medaglie */
-.medal {
-    font-size: 22px;
-}
-
-/* Numeri dal 4° posto in poi */
+/* --- MEDAGLIE & CLASSIFICA --- */
 .rank-number {
     display: inline-block;
     background: linear-gradient(135deg, #333, #555);
@@ -140,7 +133,6 @@ th {
     font-size: 14px;
 }
 
-/* Colori sfondo top 3 */
 tr.gold-row {
     background-color: #3b2f00;
 }
@@ -151,59 +143,87 @@ tr.bronze-row {
     background-color: #3a2300;
 }
 
-/* Rimuove le freccette negli input[type=number] */
+/* --- RIMUOVI FRECCETTE INPUT --- */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-
 input[type="number"] {
     appearance: textfield;
     -moz-appearance: textfield;
 }
 
-.reset-btn {
+/* --- GOOGLE LOGIN BUTTON --- */
+.google-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     padding: 10px 20px;
-    background-color: #cc0000;
-    color: white;
-    border: none;
+    background-color: #222;
+    color: gold;
+    border: 1px solid gold;
     border-radius: 6px;
     font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    margin-top: 20px;
     transition: background 0.3s;
-    margin-top: 10px;
 }
 
-.reset-btn:hover {
-    background-color: #ff0000;
+.google-btn:hover {
+    background-color: #333;
 }
 
-/* 🔄 Responsive per dispositivi piccoli */
+.google-logo {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* --- FOOTER LINKS --- */
+.footer-links {
+    margin-top: 30px;
+    font-size: 13px;
+    color: gold;
+    text-align: center;
+}
+
+.footer-links a {
+    color: gold;
+    margin: 0 5px;
+}
+
+/* --- RESPONSIVE --- */
 @media (max-width: 600px) {
-    .container {
-        margin: 20px auto;
-        padding: 15px;
+    h1 {
+        font-size: 24px;
     }
 
-    input,
-    button {
-        width: 100% !important;
-        margin: 5px 0;
-        font-size: 16px;
+    input[type="number"],
+    input[type="text"] {
+        width: 100%;
     }
 
+    button,
+    .reset-btn,
     .google-btn {
         width: 100%;
-        justify-content: center;
     }
 
     table {
         font-size: 14px;
     }
 
-    th, td {
-        padding: 10px;
+    .rank-number {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        line-height: 24px;
+    }
+
+    .container {
+        padding: 20px 15px;
     }
 }
