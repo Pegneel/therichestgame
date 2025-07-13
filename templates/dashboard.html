@@ -1,8 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Dashboard - The Richest</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        @media (max-width: 600px) {
+            body {
+                font-size: 16px;
+            }
+            .container {
+                padding: 10px;
+            }
+            input, button {
+                font-size: 16px;
+                width: 100% !important;
+                box-sizing: border-box;
+                margin-bottom: 10px;
+            }
+            table {
+                font-size: 14px;
+                width: 100%;
+            }
+            .rank-cell {
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -16,7 +41,7 @@
                 placeholder="Amount (€)" 
                 step="0.01" 
                 required 
-                style="padding: 10px; border-radius: 6px;"
+                style="padding: 10px; border-radius: 6px; max-width: 250px;"
             >
             <button type="submit" class="play-btn">💸 Play</button>
         </form>
@@ -33,44 +58,50 @@
         </form>
         {% endif %}
 
-        <table>
-            <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Total Donated (€)</th>
-            </tr>
-            <tbody id="leaderboard">
-                <!-- Classifica aggiornata in JS -->
-            </tbody>
-        </table>
+        <div style="overflow-x: auto;">
+            <table>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Total Donated (€)</th>
+                </tr>
+                <tbody id="leaderboard">
+                    <!-- Classifica aggiornata dinamicamente -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
     async function refreshLeaderboard() {
-        const response = await fetch('/api/leaderboard');
-        const data = await response.json();
-        const tbody = document.getElementById('leaderboard');
-        tbody.innerHTML = '';
+        try {
+            const response = await fetch('/api/leaderboard');
+            const data = await response.json();
+            const tbody = document.getElementById('leaderboard');
+            tbody.innerHTML = '';
 
-        data.forEach((user, index) => {
-            const row = document.createElement('tr');
+            data.forEach((user, index) => {
+                const row = document.createElement('tr');
 
-            let rankClass = '';
-            let medal = '';
-            if (index === 0) { rankClass = 'gold-row'; medal = '🥇'; }
-            else if (index === 1) { rankClass = 'silver-row'; medal = '🥈'; }
-            else if (index === 2) { rankClass = 'bronze-row'; medal = '🥉'; }
+                let rankClass = '';
+                let medal = '';
+                if (index === 0) { rankClass = 'gold-row'; medal = '🥇'; }
+                else if (index === 1) { rankClass = 'silver-row'; medal = '🥈'; }
+                else if (index === 2) { rankClass = 'bronze-row'; medal = '🥉'; }
 
-            row.className = rankClass;
+                row.className = rankClass;
 
-            row.innerHTML = `
-                <td class="rank-cell">${medal || '<span class="rank-number">' + (index + 1) + '</span>'}</td>
-                <td>${user.name}</td>
-                <td>€${parseFloat(user.amount).toFixed(2)}</td>
-            `;
+                row.innerHTML = `
+                    <td class="rank-cell">${medal || '<span class="rank-number">' + (index + 1) + '</span>'}</td>
+                    <td>${user.name}</td>
+                    <td>€${parseFloat(user.amount).toFixed(2)}</td>
+                `;
 
-            tbody.appendChild(row);
-        });
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error loading leaderboard:', error);
+        }
     }
 
     refreshLeaderboard();
@@ -78,3 +109,4 @@
     </script>
 </body>
 </html>
+

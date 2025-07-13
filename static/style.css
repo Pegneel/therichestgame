@@ -34,18 +34,23 @@ form {
     margin: 20px 0;
 }
 
-input[type="number"] {
+input[type="number"],
+input[type="text"] {
     padding: 10px;
     width: 200px;
+    max-width: 100%;
     border: 1px solid #444;
     border-radius: 6px;
     background-color: #222;
     color: #f0f0f0;
     font-size: 16px;
     transition: border 0.3s;
+    box-sizing: border-box;
+    margin: 5px 0;
 }
 
-input[type="number"]:focus {
+input[type="number"]:focus,
+input[type="text"]:focus {
     border-color: gold;
     outline: none;
 }
@@ -71,11 +76,14 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 30px;
+    overflow-x: auto;
+    display: block;
 }
 
 th, td {
     padding: 12px;
     border-bottom: 1px solid #333;
+    white-space: nowrap;
 }
 
 tr:nth-child(even) {
@@ -152,7 +160,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="number"] {
     appearance: textfield;
-    -moz-appearance: textfield; /* Firefox */
+    -moz-appearance: textfield;
 }
 
 .reset-btn {
@@ -170,4 +178,32 @@ input[type="number"] {
 
 .reset-btn:hover {
     background-color: #ff0000;
+}
+
+/* 🔄 Responsive per dispositivi piccoli */
+@media (max-width: 600px) {
+    .container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    input,
+    button {
+        width: 100% !important;
+        margin: 5px 0;
+        font-size: 16px;
+    }
+
+    .google-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 10px;
+    }
 }
