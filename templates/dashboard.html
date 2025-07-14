@@ -2,115 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - The Richest</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/style.css">
-    <style>
-        @media (max-width: 600px) {
-            body {
-                font-size: 16px;
-            }
-            input, button {
-                font-size: 16px;
-                width: 100% !important;
-                box-sizing: border-box;
-                margin-bottom: 10px;
-            }
-            table {
-                font-size: 14px;
-                width: 100%;
-            }
-            .rank-cell {
-                text-align: center;
-            }
-        }
-    </style>
+    <title>Dashboard - The Richest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-{% if current_user.email == 'andrewpegoraro94@gmail.com' %}
-<div class="container" style="max-width: 600px; margin: auto;">
-{% else %}
-<div class="container" style="max-width: 950px; margin: auto;">
-{% endif %}
+
+<div class="container {% if current_user.email != 'andrewpegoraro94@gmail.com' %}wide{% endif %}">
+
     <div style="text-align: center;">
         <h1>🏆 Leaderboard</h1>
     </div>
 
-    <p>Welcome, {{ current_user.username or current_user.name }} 
-    (<a href="/set_username">Change Username</a> | <a href="/logout">Logout</a>)</p>
+    <p>
+        Welcome, {{ current_user.username or current_user.name }}
+        (<a href="/set_username">Change Username</a> | <a href="/logout">Logout</a>)
+    </p>
 
-    <form action="/create-checkout-session" method="post" style="margin: 20px 0;">
+    <!-- FORM DONAZIONE -->
+    <form action="/create-checkout-session" method="post">
         <input 
             type="number" 
             name="amount" 
             placeholder="Amount (€)" 
             step="0.01" 
-            required 
-            style="padding: 10px; border-radius: 6px; max-width: 250px;"
+            required
         >
         <button type="submit" class="play-btn">💸 Play</button>
     </form>
 
+    <!-- Spaziatore invisibile per allargare layout dei non admin -->
+    {% if current_user.email != 'andrewpegoraro94@gmail.com' %}
+        <div style="width: 700px; height: 1px; visibility: hidden;"></div>
+    {% endif %}
+
+    <!-- PANNELLO ADMIN -->
     {% if current_user.email == 'andrewpegoraro94@gmail.com' %}
-        <form action="/reset" method="post" style="margin-top: 20px;">
+        <form action="/reset" method="post">
             <button type="submit" class="reset-btn">🔁 Reset Leaderboard</button>
         </form>
 
-        <form action="/fake_donation" method="post" style="margin-top: 20px;">
-            <input type="text" name="name" placeholder="Fake name" required style="padding: 10px; border-radius: 6px;">
-            <input type="number" step="0.01" name="amount" placeholder="Fake amount (€)" required style="padding: 10px; border-radius: 6px;">
+        <form action="/fake_donation" method="post">
+            <input type="text" name="name" placeholder="Fake name" required>
+            <input type="number" step="0.01" name="amount" placeholder="Fake amount (€)" required>
             <button type="submit" class="reset-btn">➕ Add Fake Donation</button>
         </form>
     {% endif %}
 
-    <div style="overflow-x: auto; margin-top: 30px;">
+    <!-- LEADERBOARD -->
+    <div class="table-wrapper">
         <table>
-            <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Total Donated (€)</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Total Donated (€)</th>
+                </tr>
+            </thead>
             <tbody id="leaderboard">
-                <!-- Classifica aggiornata dinamicamente -->
+                <!-- Popolato dinamicamente -->
             </tbody>
         </table>
     </div>
+
 </div>
 
 <script>
-async function refreshLeaderboard() {
-    try {
-        const response = await fetch('/api/leaderboard');
-        const data = await response.json();
-        const tbody = document.getElementById('leaderboard');
-        tbody.innerHTML = '';
+    async function refreshLeaderboard() {
+        try {
+            const response = await fetch('/api/leaderboard');
+            const data = await response.json();
+            const tbody = document.getElementById('leaderboard');
+            tbody.innerHTML = '';
 
-        data.forEach((user, index) => {
-            const row = document.createElement('tr');
+            data.forEach((user, index) => {
+                const row = document.createElement('tr');
 
-            let rankClass = '';
-            let medal = '';
-            if (index === 0) { rankClass = 'gold-row'; medal = '🥇'; }
-            else if (index === 1) { rankClass = 'silver-row'; medal = '🥈'; }
-            else if (index === 2) { rankClass = 'bronze-row'; medal = '🥉'; }
+                let rankClass = '';
+                let medal = '';
+                if (index === 0) { rankClass = 'gold-row'; medal = '🥇'; }
+                else if (index === 1) { rankClass = 'silver-row'; medal = '🥈'; }
+                else if (index === 2) { rankClass = 'bronze-row'; medal = '🥉'; }
 
-            row.className = rankClass;
+                row.className = rankClass;
 
-            row.innerHTML = `
-                <td class="rank-cell">${medal || '<span class="rank-number">' + (index + 1) + '</span>'}</td>
-                <td>${user.name}</td>
-                <td>€${parseFloat(user.amount).toFixed(2)}</td>
-            `;
+                row.innerHTML = `
+                    <td class="rank-cell">${medal || '<span class="rank-number">' + (index + 1) + '</span>'}</td>
+                    <td>${user.name}</td>
+                    <td>€${parseFloat(user.amount).toFixed(2)}</td>
+                `;
 
-            tbody.appendChild(row);
-        });
-    } catch (error) {
-        console.error('Error loading leaderboard:', error);
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error loading leaderboard:', error);
+        }
     }
-}
 
-refreshLeaderboard();
-setInterval(refreshLeaderboard, 5000);
+    refreshLeaderboard();
+    setInterval(refreshLeaderboard, 5000);
 </script>
+
 </body>
 </html>

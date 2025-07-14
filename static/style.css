@@ -1,35 +1,38 @@
-/* --- STILE BASE --- */
-html, body {
-    height: 100%;
+/* --- BODY & BACKGROUND --- */
+body {
+    background: radial-gradient(circle, #0d0d0d 0%, #000000 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #f0f0f0;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #0d0d0d;
-    color: #f0f0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    text-align: center;
 }
 
-/* --- CONTAINER --- */
+/* --- CONTAINER STILE PREMIUM --- */
 .container {
     width: 100%;
-    max-width: 1000px;
-    padding: 30px 20px;
-    background-color: #1a1a1a;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
-    box-sizing: border-box;
-    margin: 0 auto;
+    max-width: 800px;
+    margin: 60px auto;
+    background: #111;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.1), 0 0 60px rgba(255, 204, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* --- TIPOGRAFIA --- */
+/* --- HEADER E TESTI --- */
 h1 {
     color: gold;
-    margin-bottom: 30px;
-    font-size: 32px;
+    font-size: 36px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+p {
+    margin: 10px 0 30px;
+    font-size: 16px;
+    color: #ccc;
 }
 
 a {
@@ -40,97 +43,109 @@ a:hover {
     text-decoration: underline;
 }
 
-/* --- FORM --- */
+/* --- FORM STILE --- */
 form {
-    margin: 20px 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
+    margin-top: 10px;
 }
 
 input[type="number"],
 input[type="text"] {
     padding: 10px;
-    width: 200px;
-    border: 1px solid #444;
-    border-radius: 6px;
-    background-color: #222;
+    border-radius: 10px;
+    border: 1px solid #333;
+    background-color: #181818;
     color: #f0f0f0;
     font-size: 16px;
-    transition: border 0.3s;
+    max-width: 220px;
+    transition: border-color 0.3s;
 }
 
 input[type="number"]:focus,
 input[type="text"]:focus {
-    border-color: gold;
     outline: none;
+    border-color: gold;
 }
 
-/* --- BUTTONS --- */
-button,
-.reset-btn {
-    padding: 10px 20px;
+/* --- BOTTONI --- */
+.play-btn {
     background-color: gold;
     color: black;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
+    padding: 10px 20px;
     font-size: 16px;
+    border-radius: 10px;
+    border: none;
     cursor: pointer;
+    font-weight: bold;
     transition: background 0.3s;
 }
-
-button:hover {
+.play-btn:hover {
     background-color: #ffd700;
 }
 
 .reset-btn {
-    background-color: #cc0000;
+    background-color: #c70039;
     color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 .reset-btn:hover {
-    background-color: #ff0000;
+    background-color: #ff003c;
 }
 
-/* --- TABELLA --- */
+/* --- FORM FAKE DONATION ADMIN --- */
+form[action="/fake_donation"] {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+form[action="/fake_donation"] input {
+    flex: 1;
+    max-width: 200px;
+}
+
+/* --- TABELLA LEADERBOARD --- */
 .table-wrapper {
-    overflow-x: auto;
     margin-top: 30px;
+    width: 100%;
+    overflow-x: auto;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.05);
 }
 
 th, td {
-    padding: 12px;
-    border-bottom: 1px solid #333;
+    padding: 14px;
     text-align: center;
+    border-bottom: 1px solid #333;
+    font-size: 16px;
 }
 
 th {
     background-color: #111;
     color: gold;
+    font-weight: bold;
 }
 
 tr:nth-child(even) {
-    background-color: #2a2a2a;
-}
-
-/* --- MEDAGLIE & CLASSIFICA --- */
-.rank-number {
-    display: inline-block;
-    background: linear-gradient(135deg, #333, #555);
-    color: white;
-    font-weight: bold;
-    width: 28px;
-    height: 28px;
-    line-height: 28px;
-    border-radius: 50%;
-    text-align: center;
-    font-size: 14px;
+    background-color: #222;
 }
 
 tr.gold-row {
@@ -141,6 +156,11 @@ tr.silver-row {
 }
 tr.bronze-row {
     background-color: #3a2300;
+}
+
+.rank-cell {
+    font-size: 18px;
+    font-weight: bold;
 }
 
 /* --- RIMUOVI FRECCETTE INPUT --- */
@@ -154,51 +174,40 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
-/* --- GOOGLE LOGIN BUTTON --- */
+/* --- BOTTONE LOGIN CON GOOGLE --- */
 .google-btn {
+    margin-top: 30px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background-color: #222;
+    gap: 12px;
+    padding: 12px 24px;
+    background-color: #000;
     color: gold;
-    border: 1px solid gold;
-    border-radius: 6px;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid gold;
     text-decoration: none;
-    margin-top: 20px;
-    transition: background 0.3s;
+    box-shadow: 0 2px 8px rgba(255, 204, 0, 0.2);
+    transition: background 0.3s, transform 0.2s;
 }
 
 .google-btn:hover {
-    background-color: #333;
+    background-color: #1a1a1a;
+    transform: translateY(-2px);
 }
 
-.google-logo {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
+.google-btn img {
+    width: 24px;
+    height: 24px;
 }
 
-/* --- FOOTER LINKS --- */
-.footer-links {
-    margin-top: 30px;
-    font-size: 13px;
-    color: gold;
-    text-align: center;
-}
 
-.footer-links a {
-    color: gold;
-    margin: 0 5px;
-}
 
 /* --- RESPONSIVE --- */
 @media (max-width: 600px) {
-    h1 {
-        font-size: 24px;
+    .container {
+        padding: 20px 15px;
     }
 
     input[type="number"],
@@ -206,24 +215,38 @@ input[type="number"] {
         width: 100%;
     }
 
-    button,
-    .reset-btn,
-    .google-btn {
+    .play-btn,
+    .reset-btn {
         width: 100%;
     }
 
-    table {
-        font-size: 14px;
+    form {
+        flex-direction: column;
     }
 
-    .rank-number {
-        width: 24px;
-        height: 24px;
-        font-size: 12px;
-        line-height: 24px;
+    form[action="/fake_donation"] {
+        flex-direction: column;
     }
 
-    .container {
-        padding: 20px 15px;
-    }
+    .login-btn {
+    margin-top: 30px;
+    background-color: gold;
+    color: black;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.3s ease;
+}
+
+.login-btn:hover {
+    background-color: #ffd700;
+}
+
+
+
+
+
 }
