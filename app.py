@@ -267,6 +267,11 @@ def success():
 
     return redirect('/dashboard')
 
+@app.route('/public')
+def public_leaderboard():
+    users = db.session.query(User).order_by(User.total_amount.desc()).all()
+    return render_template('public_leaderboard.html', users=users)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
