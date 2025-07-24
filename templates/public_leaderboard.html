@@ -2,30 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Richest – Leaderboard</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
+
+<div class="container wide">
+    <div style="text-align: center;">
         <h1>🏆 The Richest Leaderboard</h1>
-        <table class="leaderboard">
+    </div>
+
+    <div class="table-wrapper">
+        <table>
             <thead>
                 <tr>
-                    <th>Position</th>
-                    <th>Nickname</th>
-                    <th>Total (€)</th>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Total Donated (€)</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for i, user in enumerate(users, start=1) %}
-                <tr>
-                    <td>#{{ i }}</td>
-                    <td>{{ user.nickname }}</td>
-                    <td>{{ '{:.2f}'.format(user.total_amount) }}</td>
-                </tr>
-                {% endfor %}
+            <tbody id="leaderboard">
+                <!-- Popolato dinamicamente -->
             </tbody>
         </table>
     </div>
+</div>
+
+<script>
+    async function refreshLeaderboard() {
+        try {
+            const response = await fetch('/api/leaderboard');
+            const data = await response.json();
+            const tbody = document.getElementById('leaderboard');
+            tbody.innerHTML = '';
+
+            data.forEach((user, index) => {
+                const row = document.createElement('tr');
+
+                let rankClass = '';
+                let medal = '';
+                let nickClass = '';
+                if (index === 0) {
+                    rankClass = 'gold-row';
+                    medal = '🥇';
+                    nickClass = 'nick-gold';
+                } else if (index === 1) {
+                    rankClass = 'silver-row';
+                    medal = '🥈';
+                    nickClass = 'nick-silver';
+                } else if (index === 2) {
+                    rankClass = 'bronze-row';
+                    medal = '🥉';
+                    nickClass = 'nick-bronze';
+                }
+
+                row.className = rankClass;
+
+                row.innerHTML = `
+                    <td class="rank-cell">${medal || '<span class="rank-number">' + (index + 1) + '</span>'}</td>
+                    <td class="${nickClass}">${user.name}</td>
+                    <td>€${parseFloat(user.amount).toFixed(2)}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error loading leaderboard:', error);
+        }
+    }
+
+    refreshLeaderboard();
+    setInterval(refreshLeaderboard, 5000);
+</script>
+
 </body>
 </html>

@@ -245,6 +245,35 @@ input[type="number"] {
     background-color: #ffd700;
 }
 
+.nick-gold {
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow:
+        0 0 4px #FFD700,
+        0 0 8px #FFC300,
+        0 0 12px #FFA500;
+}
+
+.nick-silver {
+    color: #C0C0C0;
+    font-weight: bold;
+    text-shadow:
+        0 0 4px #C0C0C0,
+        0 0 8px #A8A8A8,
+        0 0 12px #909090;
+}
+
+.nick-bronze {
+    color: #CD7F32;
+    font-weight: bold;
+    text-shadow:
+        0 0 4px #CD7F32,
+        0 0 8px #A0522D,
+        0 0 12px #8B4513;
+}
+
+
+
 
 
 

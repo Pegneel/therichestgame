@@ -269,7 +269,7 @@ def success():
 
 @app.route('/public')
 def public_leaderboard():
-    users = db.session.query(User).order_by(User.total_amount.desc()).all()
+    users = db.session.query(User).order_by(User.total_donated.desc()).all()
     return render_template('public_leaderboard.html', users=users)
 
 
